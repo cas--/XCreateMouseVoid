@@ -21,23 +21,18 @@ int void_x;
 int void_y;
 int void_width;
 int void_height;
-char mode = 'd'; // d=down, u=up, l=left, r=right
 
 // prints the usage
 void printUsage(char* argv0) {
 	printf("Usage:\n"
-		" %s x y w h [mode]\n"
+		" %s x y w h\n"
 		"where x and y are screen coordinates, w and h specify\n"
-		"the width and height of the void. The optional mode\n"
-		"is one of 'd', 'u', 'l', 'r' (down, up, left, right).\n"
-		"The mode specifies the mouse pointer direction, if the\n"
-		"void is hit. Default is down (void placed at the top\n"
-		"right corner of the screen.\n", argv0);
+		"the width and height of the void.\n", argv0);
 }
 
 // show usage or parse and validate arguments
 void processArguments(int argc, char* argv[]) {
-	if (argc < 5 || argc > 6) {
+	if (argc != 5) {
 		fprintf(stderr, "Wrong number of arguments.\n");
 		printUsage(argv[0]);
 		exit(0);
@@ -46,18 +41,8 @@ void processArguments(int argc, char* argv[]) {
 	void_y = atoi(argv[2]);
 	void_width = atoi(argv[3]);
 	void_height = atoi(argv[4]);
-	if (argc == 6) {
-		mode = argv[5][0];
-		if (mode != 'd' && mode != 'u' && mode != 'l' && mode != 'r') {
-			fprintf(stderr,
-					"Illegal mode %c, expected one of ['d','u','l','r'].\n",
-					mode);
-			printUsage(argv[0]);
-			exit(0);
-		}
-	}
-
-	if (void_x < 0 || void_y < 0 || void_width < 1 || void_height < 1) {
+	
+    if (void_width < 1 || void_height < 1) {
 		fprintf(stderr,
 				"Bad arguments (negative coordinate or zero width/height):\n"
 					" x=%s, y=%s, w=%s, h=%s\n", argv[1], argv[2], argv[3],
@@ -66,8 +51,8 @@ void processArguments(int argc, char* argv[]) {
 		exit(0);
 	}
 
-	printf("Settings: void at %d, %d, width %d, height %d, mode is '%c'\n",
-			void_x, void_y, void_width, void_height, mode);
+	printf("Settings: void at %d, %d, width %d, height %d\n",
+			void_x, void_y, void_width, void_height);
 }
 
 // creates an undecorated black area (window)
@@ -159,28 +144,22 @@ int main(int argc, char* argv[]) {
 		if (e.type == MotionNotify) {
 			x = e.xbutton.x; /* x mouse coordinate */
 			y = e.xbutton.y; /* y mouse coodrinate */
+            if (x < 0 || y < 0 || x > void_width || y > void_height)
+                continue;
 
-			switch (mode) {
-			case 'd': // always move down
-				dy = void_height - y + 1;
-				break;
-			case 'u': // always move up
-				dy = -y - 2;
-				break;
-			case 'l': // always move left
-				dx = -x - 2;
-				break;
-			case 'r': // always move right
-				dx = void_width - x + 1;
-				break;
-			default:
-				printf("Unknown mode: %d\n", mode);
-				exit(0);
-				break;
-			}
-
-			// printf("mouse @ %4d %4d warpby %4d %4d\n", x, y, dx, dy);
-			XWarpPointer(display, None, None, 0, 0, 0, 0, dx, dy);
+            dy = y * 2 > void_height ? void_height - y + 1 : -y - 1;
+            dx = x * 2 > void_width  ? void_width - x + 1 : -x - 1;
+            //printf("x:%d y:%d dx:%d dy:%d\n", x, y, dx, dy);
+            if (abs(dx) > abs(dy)) {
+                dx = x;
+                dy = dy <= 0 ? -1 : void_height + 1;
+            }
+            else {
+                dx = dx <= 0 ? -1 : void_width + 1;
+                dy = y;
+            }
+			//printf("mouse @ %4d %4d warpby %4d %4d\n", x, y, dx, dy);
+            XWarpPointer(display, None, w, 0, 0, 0, 0, dx, dy);
 		}
 	}
 
