@@ -1,7 +1,7 @@
 
 NAME
 	XCreateMouseVoid - creates an undecorated black window and prevents the
-	mouse from entering.
+	mouse from entering that window.
 
 SYNTAX
 	XCreateMouseVoid x y w h [mode]
@@ -22,7 +22,7 @@ ARGUMENTS
 DESCRIPTION
 	The XCreateMouseVoid function paints a black rectangle at the given
 	coordinates. If the mouse pointer enters the rectangle, it is warped to a
-	position outside the rectangle depending on the mode.
+	position outside the rectangle.
 
 	The code does not occupy CPU (polling approaches would), if the rectangle
 	is not hit. The X server only notifies the program, when the mouse pointer
@@ -53,18 +53,33 @@ aligned. It looks like this:
 +----------------+----------------+
 
 Consequently, the void starts at coordinates (1280, 0) and spans 1280*224
-pixels. When hitting the left side of the void, the pointer should move to
-the right screen (but jump down to the bottom of the void). If the pointer hits
-the bottom of the void, it should just be blocked. In both cases the desired
-behavior is to warp the mouse pointer downwards (mode 'd'). Thus, calling
+pixels. 
+In default behavior, the mouse pointer will be blocked from entering this
+void from all direction.  Thus, calling
+	XCreateMouseVoid 1280 0 1280 223
+creates a rectangle that exactly covers the invisible area of the virtual
+screen. Furthermore, the mouse pointer is always blocked from entering that
+rectangle.
+
+If an optional mode of 'd' is specified, the mouse will move downwards  when
+hitting the left side of the void and the pointer will move to the right
+screen and continue along the bottom edge of the void. If the pointer hits
+the bottom of the void, it should just be blocked. In both cases the
+behavior is to warp the mouse pointer downwards. Thus, executing
 	XCreateMouseVoid 1280 0 1280 223 d
 creates a rectangle that exactly covers the invisible area of the virtual
 screen. Furthermore, the mouse pointer is always warped to the bottom of the
-rectangle, that is to the visible area of the laptop screen. Note that the
-height needs to be one pixel smaller than the void. The four different modes
-should make this tool useful for various layouts, even vertical ones.
+void, that is to the top edge of the visible area of the laptop screen.
 
-To run this at the startup of Ubuntu, you should use
+ Automating Execution
+======================
+
+You can start XCreateMouseVoid from the X startup scripts (xinitrc).
+For example, on some distributions the following command (for instance) could be
+added to the user created file /etc/X11/xinit/xinitrc.d/dual-monitor.sh:
+	XCreateMouseVoid 1280 0 1280 223 &
+
+To run this at the startup of Ubuntu, you could use
 	System -> Preferences -> Startup Applications
 IMPORTANT: Take care, when using your computer with beamers or generally in
 varying environments. If blindly activated on startup every time, you may
@@ -74,18 +89,18 @@ case, enter a terminal and type
 
  Known Problems
 ================
+
 Sometimes the mouse pointer is flickering when hitting the void, because the
 cursor changes its icon.
 
 The code won't run without an X server. The connection is established using the
 DISPLAY environment variable.
 
+Of course it doesn't make sense to run this code in environments without an X server.
+
  Compiling the Code
 ====================
 
-The code only requires Xlib, i.e. the package libx11-dev. Calling
-	g++ XCreateMouseVoid.cc -lX11 -o XCreateMouseVoid
-should suffice. Of course it doesn't make sense to run this code in
-environments without an X server.
+Simply execute 'make' in the XCreateMouseVoid source directory.
 
 
