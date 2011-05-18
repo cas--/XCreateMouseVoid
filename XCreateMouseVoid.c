@@ -30,6 +30,7 @@ char mode = 0; // 'd'=down, 'u'=up, 'l'=left, 'r'=right, default is to block on 
 
 void printUsage(char* argv0) {
 	printf(
+		"Author: Patrick Stalph, Version: 0.1\n\n"
 		"Usage:\n\n"
 		"%s x y w h [mode]\n\n"
 		"Where 'x' and 'y' are screen coordinates of upper left corner of the void\n"
