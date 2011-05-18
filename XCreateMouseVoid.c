@@ -30,26 +30,26 @@ char mode = 0; // 'd'=down, 'u'=up, 'l'=left, 'r'=right, default is to block on 
 
 void printUsage(char* argv0) {
 	printf(
-		"Usage:\n"
-		" %s x y w h [mode]\n"
-		"where x and y are screen coordinates of upper left corner of the void",
-		"and w and h specify the width and height of the void.\n"
+		"Usage:\n\n"
+		"%s x y w h [mode]\n\n"
+		"Where 'x' and 'y' are screen coordinates of upper left corner of the void\n"
+		"and 'w' and 'h' specify the width and height of the void.\n"
 		"\n"
 		"The optional mode is one of 'd', 'u', 'l', 'r' (down, up, left, right),\n"
-		"and it overides the default 'block on all edges of the void' behavior.\n"
+		"and it overides the default 'block on all edges of the void' behavior.\n\n"
 		"For example: if 'd' is specified, and the mouse encounters a vertical\n"
 		"edge of the void, the mouse will jump down to the bottom edged of the\n"
 		"void.  This behavior allows the user to move the mouse in a horizontal\n"
 		"direction without being stopped at the vertical edge of the void:\n"
 		"the mouse will simply move down to the bottom edge of the void and\n"
-		"continue along its horizontal path\n",
+		"continue along its horizontal path.\n\n",
 		argv0
 	);
 }
 
 void processArguments(int argc, char* argv[]) {
 	if (argc < 5 || argc > 6) {
-		fprintf(stderr, "Wrong number of arguments.\n");
+		fprintf(stderr, "\nError: Wrong number of arguments.\n\n");
 		printUsage(argv[0]);
 		exit(1);
 	}
